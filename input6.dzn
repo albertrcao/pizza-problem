@@ -1,0 +1,6 @@
+n = 3;
+price = [100,10,40];
+m = 1;
+buy = [2];
+free = [1];
+costBound = 130;

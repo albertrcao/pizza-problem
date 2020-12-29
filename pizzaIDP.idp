@@ -1,0 +1,262 @@
+// CMPT 417 - Final Project Part 1
+// Albert Cao (301254951)
+// Pizza Problem - Ordering pizza for the boys.
+
+// https://dtai.cs.kuleuven.be/software/idp
+// https://dtai.cs.kuleuven.be/krr/files/TutorialIDP.pdf
+// https://dtai.cs.kuleuven.be/krr/files/bib/manuals/idp3-manual.pdf
+
+vocabulary Vocab {    
+	type pizzas isa int // n
+    type coupons isa int // m
+    
+    n : pizzas // the number of pizzas
+	m : coupons // the number of coupons
+    costBound : int // the amount of money we have to spend
+    cost : int // the final amount of money spent
+    
+    price(pizzas) : int // price of each pizza
+    buy(coupons) : int // we must buy a certain number of pizzas to use each coupon
+    free(coupons) : int // each coupon we use lets us get some number of pizzas free
+    
+    paid(pizzas) // set of pizzas we will pay for
+    used(coupons) // set of coupons we will use
+    justifies(coupons, pizzas) // holds if pizza p is one of the pizzas purchased to justify using coupon c
+    usedFor(coupons, pizzas) // holds if we are getting pizza p free by using coupon c
+}
+
+// Structs (All inputs)
+
+// Satisfiable
+structure Struct1 : Vocab {
+    n = 4
+    pizzas = {1..4}
+    m = 2
+    coupons = {1..2}
+    price = {1->10; 2->5; 3->20; 4->15}
+    buy = {1->1; 2->2}
+    free = {1->1; 2->1}
+    costBound = 50
+}
+
+structure Struct2 : Vocab {
+    n = 4
+    pizzas = {1..4}
+    m = 7
+    coupons = {1..7}
+    price = {1->10; 2->15; 3->20; 4->15}
+    buy = {1->1; 2->2; 3->2; 4->8; 5->3; 6->1; 7->4}
+    free = {1->1; 2->1; 3->2; 4->9; 5->1; 6->0; 7->1}
+    costBound = 50
+}
+
+structure Struct3 : Vocab {
+    n = 10
+    pizzas = {1..10}
+    m = 4
+    coupons = {1..4}
+    price = {1->70; 2->10; 3->60; 4->60; 5->30; 6->100; 7->60; 8->40; 9->60; 10->20}
+    buy = {1->1; 2->2; 3->1; 4->1}
+    free = {1->1; 2->1; 3->1; 4->0}
+    costBound = 400
+}
+
+structure Struct4 : Vocab {
+    n = 8
+    pizzas = {1..8}
+    m = 5
+    coupons = {1..5}
+    price = {1->30;2->5;3->35;4->40;5->55;6->100;7->20;8->70}
+    buy = {1->1;2->2;3->3;4->1;5->1}
+    free = {1->1;2->2;3->1;4->4;5->1}
+    costBound = 150
+}
+
+structure Struct5 : Vocab {
+    n = 20
+    pizzas = {1..20}
+    m = 3
+    coupons = {1..3}
+    price = {1->75;2->30;3->60;4->80;5->10;6->85;7->15;8->40;9->20;10->20;
+        	 11->10;12->65;13->15;14->10;15->20;16->70;17->45;18->20;19->10;20->10}
+    buy = {1->1;2->2;3->4}
+    free = {1->1;2->1;3->6}
+    costBound = 500
+}
+
+// Unsatisfiable
+structure Struct6 : Vocab {
+    n = 3
+    pizzas = {1..3}
+    m = 1
+    coupons = {1}
+	price = {1->100;2->10;3->40}
+	buy = {1->2}
+	free = {1->1}
+	costBound = 130
+}
+
+structure Struct7 : Vocab {
+    n = 5
+    pizzas = {1..5}
+    m = 3
+    coupons = {1..3}
+	price = {1->10;2->10;3->40;4->70;5->20}
+	buy = {1->2;2->1;3->1}
+	free = {1->1;2->0;3->1}
+	costBound = 70
+}
+
+structure Struct8 : Vocab {
+    n = 15
+    pizzas = {1..15}
+    m = 5
+    coupons = {1..5}
+	price = {1->70;2->10;3->10;4->100;5->20;6->5;7->95;8->40;9->30;10->20;
+        	 11->20;12->90;13->10;14->100;15->70}
+    buy = {1->5;2->3;3->5;4->1;5->2}
+    free = {1->3;2->3;3->1;4->1;5->2}
+    costBound = 300
+}
+
+structure Struct9 : Vocab {
+    n = 12
+    pizzas = {1..12}
+    m = 7
+    coupons = {1..7}
+	price = {1->35;2->15;3->5;4->200;5->10;6->85;7->60;8->40;9->20;10->20;11->30;12->15}
+    buy = {1->3;2->2;3->10;4->4;5->6;6->1;7->1}
+    free = {1->3;2->1;3->3;4->2;5->2;6->1;7->0}
+    costBound = 350
+}
+
+structure Struct10 : Vocab {
+    n = 20
+    pizzas = {1..20}
+    m = 5
+    coupons = {1..10}
+	price = {1->15;2->5;3->5;4->70;5->60;6->25;7->50;8->90;9->100;10->10;
+        	 11->20;12->35;13->70;14->10;15->10;16->95;17->20;18->55;19->40;20->10}
+	buy = {1->5;2->3;3->6;4->9;5->1}
+	free = {1->3;2->3;3->2;4->4;5->1}
+	costBound = 350
+}
+
+term CostBound: Vocab {
+	costBound
+}
+
+term Cost: Vocab {
+	cost
+}
+
+theory Theory : Vocab {
+    cost = sum{ p[pizzas] : paid(p) : price(p)}.
+     
+    // Constraint 1 - we pay for exactly the pizzas we don't get for free by using coupons.
+    // For all pizzas p, p is in paid if and only if there is not a coupon c that was used to get p.
+    // Defines the set of paid pizzas.
+    !p : paid(p) <=> ~?c : usedFor(c, p).
+    
+    // Constraint 2 - Used is the set of coupons we use.
+	// For all coupons c, c is in used if and only if there is a pizza p that was received by using c.
+	// Defines the set of used coupons.
+    !c : used(c) <=> ?p : usedFor(c, p).
+    
+    // Constraint 3 - Any coupon we used must be justified by enough paid pizzas.
+	// For all coupons c, if c is in used, then the number of pizzas p that we used to justify applying c is at least as
+    // many as the number of pizzas c says we have to buy.
+    !c : used(c) => #{p[pizzas] : justifies(c, p)} >= buy(c).
+    
+    // Constraint 4 - No coupon is used for too many pizzas.
+	// For all coupons c, the number of pizzas we get for free by applying a coupon is at most the number of pizzas c says
+    // we're allowed to get free.
+    !c[coupons] : #{p[pizzas] : usedFor(c, p)} =< free(c).
+    
+    // Constraint 5 - Each free pizza costs at most as much as the cheapest pizza purchased to justify the coupon used.
+    // For all coupons c, and every 2 pizzas p1, p2 (that are not identical), if we used c to justify getting p1 for free,
+    // and we bought p2 to justify applying c, then the price of p1 must be at most the price of p2.
+    !c p1 p2 : (usedFor(c, p1) & justifies(c, p2)) => (price(p1) =< price(p2)).
+    
+    // Constraint 6 - We pay for all pizzas that justify using coupons.
+	// For all coupons c and pizzas p, if p is used to justify applying c, then we must pay for p.
+    !p c : justifies(c, p) => paid(p).
+    
+    // Constraint 7 - The total cost is not too high.
+	// The price of the sum over all pizzas p that are paid for is at most costBound.
+    sum{p[pizzas] : paid(p) : price(p)} =< costBound.
+    
+    // Constraint 8 - Justifies and UsedFor hold only of coupon-pizza pairs.
+    // For all coupons c and pizzas p, if justifies(c, p) then c has to be a coupon and p has to be a pizza.
+    // For all coupons c and pizzas p, if usedFor(c, p) then c has to be a coupon and p has to be a pizza.
+    !c p : ((justifies(c, p) => (1 =< c & c =< m & 1 =< p & p =< n)) &
+    		(usedFor(c, p) => (1 =< c & c =< m & 1 =< p & p =< n))).
+    
+    // Bonus Constraint - For all coupons c and pizzas p, if c has been used to justify getting p, then it cannot be used again.
+	// For all coupons c and pizzas p, if justifies(c, p) then there is not a coupon q not equal to c that was used to justify getting p.  
+    !c p : justifies(c, p) => ~?q[coupons] : q ~= c & justifies(q, p).
+}
+
+procedure main() {
+    // Such that: we get all pizzas, cost is less than or equal to costBound, and coupons are used only if justified.
+	// printmodels(minimize(Theory, Struct, Term, Vocab))
+    
+    stdoptions.verbosity.solving = 1
+    
+    // Input 1
+    print("Input 1")
+    print("costBound(50)")
+    print("cost("..value(Cost, minimize(Theory, Struct1, Cost)[1])..")")
+    
+    // Input 2
+    print("Input 2")
+    print("costBound(50)")
+    print("cost("..value(Cost, minimize(Theory, Struct2, Cost)[1])..")")
+    
+    // Input 3
+    print("Input 3")
+    print("costBound(400)")
+    print("cost("..value(Cost, minimize(Theory, Struct3, Cost)[1])..")")
+    
+    // Input 4
+    print("Input 4")
+    print("costBound(150)")
+    print("cost("..value(Cost, minimize(Theory, Struct4, Cost)[1])..")") 
+    
+    // Input 5
+    print("Input 5")
+    print("costBound(500)")
+    print("cost("..value(Cost, minimize(Theory, Struct5, Cost)[1])..")")
+    
+    // Input 6
+    print("Input 6")
+    print("costBound(130)")
+    printmodels(minimize(Theory, Struct6, Cost, Vocab))
+    
+    // Input 7
+    print("Input 7")
+    print("costBound(70)")
+    printmodels(minimize(Theory, Struct7, Cost, Vocab))
+    
+    // Input 8
+    print("Input 8")
+    print("costBound(300)")
+    printmodels(minimize(Theory, Struct8, Cost, Vocab))
+    
+    // Input 9
+    print("Input 9")
+    print("costBound(350)")
+    printmodels(minimize(Theory, Struct9, Cost, Vocab))
+    
+    // Input 10
+    print("Input 10")
+    print("costBound(350)")
+    printmodels(minimize(Theory, Struct10, Cost, Vocab))
+    
+    // Printing unsatcores
+    //printunsatcore(Theory,Struct6)
+    //printunsatcore(Theory,Struct7)
+    //printunsatcore(Theory,Struct8)
+    //printunsatcore(Theory,Struct9)
+    //printunsatcore(Theory,Struct10)
+}
