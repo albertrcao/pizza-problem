@@ -1,5 +1,4 @@
-% CMPT 417 - Final Project Part 1
-% Albert Cao (301254951)
+% Albert Cao
 % Pizza Problem - Ordering pizza for the boys.
 
 % https://www.minizinc.org/doc-2.5.3/en/part_2_tutorial.html
